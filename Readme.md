@@ -1,0 +1,1 @@
+# Testing Javascript applications with Selenium
