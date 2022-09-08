@@ -30,6 +30,10 @@ public class BrowserBot {
 		element.sendKeys(text);
 	}
 
+	public void typeById(String locator, String text) {
+		type(By.id(locator), text);
+	}
+	
 	public String getAlertText() {
 		return getAlertText(Duration.ofSeconds(30));
 	}

@@ -287,13 +287,17 @@ public class DefaultSuiteTest {
 				is("ERRORES:\n   Contraseña: Utiliza un formato que coincida con el solicitado"));
 		driver.switchTo().alert().accept();
 		driver.findElement(By.cssSelector(".input-group")).click();
-		driver.findElement(By.id("txtPassword")).sendKeys("P@$$w0rs");
-		driver.findElement(By.id("txtUsuario")).sendKeys("admin@kk");
+//		driver.findElement(By.id("txtPassword")).sendKeys("P@$$w0rs");
+//		driver.findElement(By.id("txtUsuario")).sendKeys("admin@kk");
+		browserBot.typeById("txtPassword", "P@$$w0rs");
+		browserBot.typeById("txtUsuario", "admin@kk");
 		driver.findElement(By.cssSelector(".fa-sign-in-alt")).click();
-		Alert alert = new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.alertIsPresent());
-		assertThat(alert.getText(),
-				is("Usuario o contraseña incorrectos."));
-		alert.accept();
+//		Alert alert = new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.alertIsPresent());
+//		assertThat(alert.getText(),
+//				is("Usuario o contraseña incorrectos."));
+//		alert.accept();
+		assertEquals("Usuario o contraseña incorrectos.", browserBot.getAlertText());
+
 	}
 
 	@Test
