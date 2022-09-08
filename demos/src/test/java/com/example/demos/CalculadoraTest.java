@@ -3,6 +3,7 @@ package com.example.demos;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -51,6 +52,7 @@ class CalculadoraTest {
 			
 			@Test
 			@DisplayName("Resta dos numeros reales")
+			@Disabled
 			void testSumaDoubleDouble2() {
 				assertEquals(0.1, calc.suma(1, -0.9));
 			}

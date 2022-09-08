@@ -6,6 +6,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -29,7 +31,12 @@ import com.example.selenium.utils.BrowserBot;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+
 import java.util.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -62,7 +69,7 @@ public class DefaultSuiteTest {
 //		assertThat(driver.findElement(By.id("userData")).getText(), is("Hola Administrador"));
 		var result = new WebDriverWait(driver, Duration.ofSeconds(30))
 		        .until(ExpectedConditions.textToBe(By.id("userData"), "Hola Administrador"));
-		assertTrue(result);
+		assertTrue( "Sin el saludo", result);
 	}
 
 	public void empLogin() {
@@ -75,6 +82,12 @@ public class DefaultSuiteTest {
 		        .until(ExpectedConditions.textToBe(By.id("userData"), "Hola Empleado"));
 		assertTrue(result);
 	}
+	
+//	@Test
+//	public void buscar() {
+//		driver.get("http://google.es/");
+//		Alert alert = new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.alertIsPresent());
+//	}
 
 	@Test
 	public void navegacion() {
@@ -146,10 +159,11 @@ public class DefaultSuiteTest {
 	@Test
 	public void cuenta_filas() {
 		driver.get("http://192.168.1.156:8181/contactos");
-		vars.put("filas", driver.findElements(By.xpath("//tbody/tr")).size());
-		assertEquals(vars.get("filas").toString(), "8");
-		driver.findElement(By.cssSelector(".fa-angle-double-right")).click();
+		new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.titleContains("Contactos"));
 		int filas = driver.findElements(By.xpath("//tbody/tr")).size();
+		assertEquals(filas, 8);
+		driver.findElement(By.cssSelector(".fa-angle-double-right")).click();
+		filas = driver.findElements(By.xpath("//tbody/tr")).size();
 		assertEquals(filas-1, 2);
 	}
 
@@ -236,6 +250,7 @@ public class DefaultSuiteTest {
 //		assertThat(driver.findElement(By.id("txtPantalla")).getText(), is("12"));
 	}
 
+	@Test
 	public void login_admin() {
 		logout();
 		driver.findElement(By.id("txtUsuario")).sendKeys("adm@kk.kk");
@@ -257,6 +272,7 @@ public class DefaultSuiteTest {
 	@Test
 	public void login_incorrecto() {
 		driver.get("http://192.168.1.156:8181/");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		driver.findElement(By.cssSelector(".fa-sign-in-alt")).click();
 		assertThat(driver.switchTo().alert().getText(),
 				is("ERRORES:\n   Usuario: Completa este campo\n   Contraseña: Completa este campo"));
@@ -273,6 +289,11 @@ public class DefaultSuiteTest {
 		driver.findElement(By.cssSelector(".input-group")).click();
 		driver.findElement(By.id("txtPassword")).sendKeys("P@$$w0rs");
 		driver.findElement(By.id("txtUsuario")).sendKeys("admin@kk");
+		driver.findElement(By.cssSelector(".fa-sign-in-alt")).click();
+		Alert alert = new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.alertIsPresent());
+		assertThat(alert.getText(),
+				is("Usuario o contraseña incorrectos."));
+		alert.accept();
 	}
 
 	@Test
@@ -285,7 +306,8 @@ public class DefaultSuiteTest {
 	}
 
 	@Test
-	public void crud() {
+	public void crud() throws IOException {
+		File scrFile;
 		driver.get("http://192.168.1.156:8181/contactos");
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 		driver.manage().window().setSize(new Dimension(1212, 667));
@@ -313,11 +335,14 @@ public class DefaultSuiteTest {
 		driver.findElement(By.id("telefono")).clear();
 		driver.findElement(By.id("telefono")).sendKeys("555 123 456");
 		driver.findElement(By.id("btnEnviar")).click();
-		new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(By.id("listado")));
+        scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        FileUtils.copyFile(scrFile, new File("./image1.png"));		new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(By.id("listado")));
 		assertThat(driver.findElement(By.cssSelector("tr:nth-child(2) .container .btn")).getText(), is("Sr. 1111 Grillo"));
-		driver.findElement(By.cssSelector("tr:nth-child(2) .btn-success > .fas")).click();
+		driver.findElement(By.cssSelector("tr:nth-child(2) .btn-success")).click();
 		driver.findElement(By.id("apellidos")).sendKeys("Grillosss");
 		driver.findElement(By.id("btnVolver")).click();
+        scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        FileUtils.copyFile(scrFile, new File("./image2.png"));		new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(By.id("listado")));
 		new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(By.id("listado")));
 		assertThat(driver.findElement(By.cssSelector("tr:nth-child(2) .container .btn")).getText(), is("Sr. 1111 Grillo"));
 		driver.findElement(By.cssSelector("tr:nth-child(2) .btn-info")).click();
@@ -334,5 +359,8 @@ public class DefaultSuiteTest {
 		new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(By.id("listado")));
 		assertThat(driver.findElement(By.cssSelector("tr:nth-child(2) .container .btn")).getText(),
 				is("Dr. Adolf Dunster"));
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(By.id("listado")));
+        scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        FileUtils.copyFile(scrFile, new File("./image3.png"));		
 	}
 }
