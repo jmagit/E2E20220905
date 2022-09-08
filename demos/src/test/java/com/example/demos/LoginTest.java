@@ -23,9 +23,9 @@ public class LoginTest {
 
 	@BeforeEach
 	public void setUp() throws MalformedURLException {
-		//driver = new ChromeDriver();
-		FirefoxOptions firefoxOptions = new FirefoxOptions();
-		driver = new RemoteWebDriver(new URL("http://localhost:4449"), firefoxOptions);
+		driver = new ChromeDriver();
+//		FirefoxOptions firefoxOptions = new FirefoxOptions();
+//		driver = new RemoteWebDriver(new URL("http://localhost:4449"), firefoxOptions);
 
 	}
 
